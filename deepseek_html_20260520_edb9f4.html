@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Matrix Consistency Learning System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Courier New', monospace;
+        }
+        body {
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 20px 30px 40px;
+        }
+        h1, h2, h3 {
+            color: #1e3c72;
+            border-left: 6px solid #2c7da0;
+            padding-left: 18px;
+            margin-top: 1.2em;
+        }
+        .panel {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .matrix-input {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        table {
+            border-collapse: collapse;
+            background: white;
+            margin: 10px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        th {
+            background: #e9ecef;
+            font-weight: 600;
+        }
+        input.matrix-cell {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        button {
+            background: #2c7da0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 5px 8px 5px 0;
+        }
+        button:hover {
+            background: #1f5e7a;
+            transform: scale(0.97);
+        }
+        .quiz-area {
+            background: #eef2ff;
+            border-radius: 24px;
+            padding: 15px 25px;
+            margin: 25px 0;
+        }
+        .answer-input {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .answer-input input, .answer-input select {
+            padding: 8px 14px;
+            font-size: 1rem;
+            border-radius: 30px;
+            border: 1px solid #aaa;
+            flex: 1;
+            min-width: 180px;
+        }
+        .feedback {
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 18px;
+            background: #fef9e3;
+            margin-top: 12px;
+        }
+        .echelon {
+            background: #e9f5e9;
+            padding: 12px;
+            border-radius: 18px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .result-box {
+            background: #d9e8f5;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        hr {
+            margin: 30px 0;
+        }
+        .badge {
+            background: #1e3c72;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 14px;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #5a6e7c;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 15px; }
+            input.matrix-cell { width: 65px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📐 MATRIX CONSISTENCY LEARNING SYSTEM</h1>
+    <p>Interactive web version – enter linear system, compute ranks, answer questions, and learn the Rouché–Capelli theorem.</p>
+
+    <!-- Step 1: Dimensions -->
+    <div class="panel">
+        <h3>🔢 Step 1: System dimensions</h3>
+        <label>Number of equations (m): </label>
+        <input type="number" id="mInput" min="1" max="6" value="2" style="width:80px">
+        <label style="margin-left:20px">Number of variables (n): </label>
+        <input type="number" id="nInput" min="1" max="6" value="2" style="width:80px">
+        <button id="resizeBtn">🔄 Create matrix tables</button>
+    </div>
+
+    <!-- Step 2: Coefficient Matrix A and Constant B -->
+    <div id="matrixPanel" style="display: none;">
+        <div class="panel">
+            <h3>📊 Step 2: Enter coefficient matrix A (m x n)</h3>
+            <div id="matrixA" class="matrix-input"></div>
+            <h3>📌 Constant matrix B (m x 1)</h3>
+            <div id="matrixB" class="matrix-input"></div>
+            <button id="submitMatricesBtn">✅ Submit & Compute Ranks</button>
+        </div>
+    </div>
+
+    <!-- After submission: show matrices & ranks, then interactive questions -->
+    <div id="quizSection" style="display: none;">
+        <div class="result-box" id="displayMatrices"></div>
+        <div id="rankInfo" class="result-box"></div>
+
+        <!-- QUESTION 1: rank of A -->
+        <div id="q1Area" class="quiz-area">
+            <h3>❓ QUESTION 1: Rank of coefficient matrix A</h3>
+            <div class="answer-input">
+                <input type="number" id="rankAuser" placeholder="Enter rank">
+                <button id="checkRankABtn">Check answer</button>
+            </div>
+            <div id="q1Feedback" class="feedback"></div>
+            <div id="echelonA" class="echelon" style="display:none;"></div>
+        </div>
+
+        <!-- QUESTION 2: rank of augmented matrix -->
+        <div id="q2Area" class="quiz-area" style="display:none;">
+            <h3>❓ QUESTION 2: Rank of augmented matrix [A|B]</h3>
+            <div class="answer-input">
+                <input type="number" id="rankABuser" placeholder="Enter rank">
+                <button id="checkRankABBtn">Check answer</button>
+            </div>
+            <div id="q2Feedback" class="feedback"></div>
+            <div id="echelonAB" class="echelon" style="display:none;"></div>
+        </div>
+
+        <!-- QUESTION 3: consistency -->
+        <div id="q3Area" class="quiz-area" style="display:none;">
+            <h3>❓ QUESTION 3: Is the system Consistent or Inconsistent?</h3>
+            <div class="answer-input">
+                <select id="consistencyUser">
+                    <option value="">-- select --</option>
+                    <option value="consistent">Consistent</option>
+                    <option value="inconsistent">Inconsistent</option>
+                </select>
+                <button id="checkConsistencyBtn">Check answer</button>
+            </div>
+            <div id="q3Feedback" class="feedback"></div>
+        </div>
+
+        <!-- QUESTION 4: solution type -->
+        <div id="q4Area" class="quiz-area" style="display:none;">
+            <h3>❓ QUESTION 4: Type of solution</h3>
+            <div class="answer-input">
+                <select id="solutionTypeUser">
+                    <option value="">-- choose --</option>
+                    <option value="unique solution">Unique Solution</option>
+                    <option value="infinite solutions">Infinite Solutions</option>
+                    <option value="no solution">No Solution</option>
+                </select>
+                <button id="checkSolutionBtn">Check answer</button>
+            </div>
+            <div id="q4Feedback" class="feedback"></div>
+        </div>
+
+        <!-- Final analysis -->
+        <div id="finalAnalysis" style="display:none;" class="result-box">
+            <h3>📈 FINAL ANALYSIS</h3>
+            <div id="finalText"></div>
+        </div>
+    </div>
+    <footer>🎓 Theorem: rank(A) = rank([A|B]) → consistent; rank = n → unique; rank < n → infinite solutions.</footer>
+</div>
+
+<script>
+    // ---------- Global variables ----------
+    let m = 2, n = 2;
+    let A_matrix = [], B_matrix = [];
+    let rank_A = null, rank_AB = null;
+    let consistency = "", solutionType = "";
+    let currentStep = 0;  // 0: before submit, after submit we unlock q1
+    let attemptCounter = { q1:0, q2:0, q3:0, q4:0 };
+    let correctFlags = { q1:false, q2:false, q3:false, q4:false };
+    
+    // Helper: compute rank using Gaussian elimination (numerical tolerance)
+    function computeRank(matrix) {
+        if (!matrix.length) return 0;
+        let mat = matrix.map(row => [...row]); // deep copy
+        const rows = mat.length, cols = mat[0].length;
+        let rank = 0;
+        const tol = 1e-8;
+        for (let c = 0; c < cols && rank < rows; c++) {
+            // find pivot
+            let pivotRow = -1;
+            for (let i = rank; i < rows; i++) {
+                if (Math.abs(mat[i][c]) > tol) {
+                    pivotRow = i;
+                    break;
+                }
+            }
+            if (pivotRow === -1) continue;
+            // swap rows
+            [mat[rank], mat[pivotRow]] = [mat[pivotRow], mat[rank]];
+            const pivotVal = mat[rank][c];
+            // normalize pivot row (optional but stable)
+            for (let k = c; k < cols; k++) mat[rank][k] /= pivotVal;
+            // eliminate below
+            for (let i = rank+1; i < rows; i++) {
+                const factor = mat[i][c];
+                if (Math.abs(factor) > tol) {
+                    for (let k = c; k < cols; k++) {
+                        mat[i][k] -= factor * mat[rank][k];
+                    }
+                }
+            }
+            rank++;
+        }
+        return rank;
+    }
+
+    // compute row echelon form (pretty printing)
+    function getEchelonForm(matrix) {
+        let mat = matrix.map(row => [...row]);
+        const rows = mat.length, cols = mat[0].length;
+        const tol = 1e-8;
+        let r = 0;
+        for (let c = 0; c < cols && r < rows; c++) {
+            let pivot = -1;
+            for (let i = r; i < rows; i++) {
+                if (Math.abs(mat[i][c]) > tol) { pivot = i; break; }
+            }
+            if (pivot === -1) continue;
+            if (pivot !== r) [mat[r], mat[pivot]] = [mat[pivot], mat[r]];
+            const pivotVal = mat[r][c];
+            for (let k = c; k < cols; k++) mat[r][k] /= pivotVal;
+            for (let i = r+1; i < rows; i++) {
+                const factor = mat[i][c];
+                if (Math.abs(factor) > tol) {
+                    for (let k = c; k < cols; k++) mat[i][k] -= factor * mat[r][k];
+                }
+            }
+            r++;
+        }
+        // format nicely
+        return mat.map(row => row.map(v => Math.abs(v) < 1e-8 ? 0 : v.toFixed(4)).join('\t')).join('\n');
+    }
+
+    // build dynamic tables for A and B
+    function buildMatrixTables() {
+        m = parseInt(document.getElementById('mInput').value);
+        n = parseInt(document.getElementById('nInput').value);
+        if (m < 1 || n < 1) { alert("Dimensions must be >=1"); return; }
+        const containerA = document.getElementById('matrixA');
+        const containerB = document.getElementById('matrixB');
+        // Build A table
+        let htmlA = '<table><thead><tr><th></th>';
+        for (let j=0; j<n; j++) htmlA += `<th>x${j+1}</th>`;
+        htmlA += '</tr></thead><tbody>';
+        for (let i=0; i<m; i++) {
+            htmlA += `<tr><td style="background:#eef">Eq ${i+1}</td>`;
+            for (let j=0; j<n; j++) {
+                htmlA += `<td><input type="number" step="any" class="matrix-cell" id="A_${i}_${j}" value="0"></td>`;
+            }
+            htmlA += '</tr>';
+        }
+        htmlA += '</tbody></table>';
+        containerA.innerHTML = htmlA;
+        
+        // Build B table (column vector)
+        let htmlB = '<table><thead><tr><th></th><th>B</th></tr></thead><tbody>';
+        for (let i=0; i<m; i++) {
+            htmlB += `<tr><td style="background:#eef">Eq ${i+1}</td>
+                      <td><input type="number" step="any" class="matrix-cell" id="B_${i}" value="0"></td></tr>`;
+        }
+        htmlB += '</tbody></table>';
+        containerB.innerHTML = htmlB;
+        document.getElementById('matrixPanel').style.display = 'block';
+        document.getElementById('quizSection').style.display = 'none';
+    }
+
+    // read matrices from UI
+    function readMatricesFromUI() {
+        let A = [];
+        for (let i=0; i<m; i++) {
+            let row = [];
+            for (let j=0; j<n; j++) {
+                let val = parseFloat(document.getElementById(`A_${i}_${j}`).value);
+                if (isNaN(val)) val = 0;
+                row.push(val);
+            }
+            A.push(row);
+        }
+        let B = [];
+        for (let i=0; i<m; i++) {
+            let val = parseFloat(document.getElementById(`B_${i}`).value);
+            if (isNaN(val)) val = 0;
+            B.push([val]);
+        }
+        return { A, B };
+    }
+
+    // display matrices with nice formatting
+    function displayMatrices(A, B) {
+        let str = "<h3>📋 Your matrices</h3>";
+        str += "<div><strong>Coefficient matrix A:</strong><pre>" + JSON.stringify(A).replace(/],/g, '],\n') + "</pre></div>";
+        str += "<div><strong>Constant matrix B:</strong><pre>" + JSON.stringify(B).replace(/],/g, '],\n') + "</pre></div>";
+        const AB = A.map((row, idx) => [...row, B[idx][0]]);
+        str += "<div><strong>Augmented [A|B]:</strong><pre>" + JSON.stringify(AB).replace(/],/g, '],\n') + "</pre></div>";
+        document.getElementById('displayMatrices').innerHTML = str;
+    }
+
+    // reset quiz state
+    function resetQuizState() {
+        currentStep = 0;
+        correctFlags = { q1:false, q2:false, q3:false, q4:false };
+        attemptCounter = { q1:0, q2:0, q3:0, q4:0 };
+        document.getElementById('q1Area').style.display = 'block';
+        document.getElementById('q2Area').style.display = 'none';
+        document.getElementById('q3Area').style.display = 'none';
+        document.getElementById('q4Area').style.display = 'none';
+        document.getElementById('finalAnalysis').style.display = 'none';
+        // clear feedbacks
+        ['q1Feedback','q2Feedback','q3Feedback','q4Feedback'].forEach(id => document.getElementById(id).innerHTML = '');
+        document.getElementById('rankAuser').value = '';
+        document.getElementById('rankABuser').value = '';
+        document.getElementById('consistencyUser').value = '';
+        document.getElementById('solutionTypeUser').value = '';
+        document.getElementById('echelonA').style.display = 'none';
+        document.getElementById('echelonAB').style.display = 'none';
+    }
+
+    // main submit: compute ranks and start interactive quiz
+    function submitMatrices() {
+        const { A, B } = readMatricesFromUI();
+        if (A.length === 0 || B.length === 0) return;
+        A_matrix = A;
+        B_matrix = B;
+        // build augmented
+        const augmented = A_matrix.map((row, i) => [...row, B_matrix[i][0]]);
+        rank_A = computeRank(A_matrix);
+        rank_AB = computeRank(augmented);
+        
+        // consistency & solution
+        if (rank_A === rank_AB) {
+            consistency = "Consistent";
+            if (rank_A === n) solutionType = "Unique Solution";
+            else solutionType = "Infinite Solutions";
+        } else {
+            consistency = "Inconsistent";
+            solutionType = "No Solution";
+        }
+        
+        displayMatrices(A_matrix, B_matrix);
+        document.getElementById('rankInfo').innerHTML = `🔍 Backend computed: rank(A) = ${rank_A},  rank([A|B]) = ${rank_AB}<br> System will be ${consistency} with ${solutionType}. Answer the questions!`;
+        document.getElementById('quizSection').style.display = 'block';
+        resetQuizState();
+    }
+
+    // Show row echelon form for hint
+    function showEchelon(mat, title, targetDivId) {
+        const echelonStr = getEchelonForm(mat);
+        const div = document.getElementById(targetDivId);
+        div.innerHTML = `<strong>📐 ${title} (Row Echelon Form)</strong><br><pre>${echelonStr}</pre>`;
+        div.style.display = 'block';
+    }
+    
+    // Question 1 logic
+    function handleQ1() {
+        if (correctFlags.q1) { document.getElementById('q1Feedback').innerHTML = "✅ Already answered correctly!"; return; }
+        let userVal = parseInt(document.getElementById('rankAuser').value);
+        if (isNaN(userVal)) { document.getElementById('q1Feedback').innerHTML = "❌ Please enter a number."; return; }
+        if (userVal === rank_A) {
+            document.getElementById('q1Feedback').innerHTML = "✅ Correct Answer! Well done.";
+            correctFlags.q1 = true;
+            // unlock Q2
+            document.getElementById('q2Area').style.display = 'block';
+        } else {
+            attemptCounter.q1++;
+            let fb = `❌ Incorrect. `;
+            if (attemptCounter.q1 === 1) {
+                fb += "💡 Hint: Convert matrix into echelon form & count non-zero rows.";
+                showEchelon(A_matrix, "Coefficient matrix A", "echelonA");
+            } else if (attemptCounter.q1 === 2) {
+                fb += "💡 Hint: Count non-zero rows after row reduction.";
+            } else {
+                fb += `✅ Correct rank of A is ${rank_A}. Moving on.`;
+                correctFlags.q1 = true;
+                document.getElementById('q2Area').style.display = 'block';
+            }
+            document.getElementById('q1Feedback').innerHTML = fb;
+        }
+    }
+    
+    // Question 2: rank of augmented
+    function handleQ2() {
+        if (correctFlags.q2) { document.getElementById('q2Feedback').innerHTML = "✅ Already answered!"; return; }
+        if (!correctFlags.q1) { document.getElementById('q2Feedback').innerHTML = "⚠️ Please answer Question 1 first."; return; }
+        let userVal = parseInt(document.getElementById('rankABuser').value);
+        if (isNaN(userVal)) { document.getElementById('q2Feedback').innerHTML = "❌ Enter a valid integer."; return; }
+        if (userVal === rank_AB) {
+            document.getElementById('q2Feedback').innerHTML = "✅ Correct Answer! Great.";
+            correctFlags.q2 = true;
+            document.getElementById('q3Area').style.display = 'block';
+        } else {
+            attemptCounter.q2++;
+            let fb = `❌ Incorrect. `;
+            const augmentedMat = A_matrix.map((row,i) => [...row, B_matrix[i][0]]);
+            if (attemptCounter.q2 === 1) {
+                fb += "💡 Hint: Include constant column and reduce augmented matrix.";
+                showEchelon(augmentedMat, "Augmented matrix [A|B]", "echelonAB");
+            } else if (attemptCounter.q2 === 2) {
+                fb += "💡 Hint: Compare with echelon form above.";
+            } else {
+                fb += `✅ Correct rank of [A|B] is ${rank_AB}. Moving on.`;
+                correctFlags.q2 = true;
+                document.getElementById('q3Area').style.display = 'block';
+            }
+            document.getElementById('q2Feedback').innerHTML = fb;
+        }
+    }
+    
+    // Question 3: consistency
+    function handleQ3() {
+        if (correctFlags.q3) { document.getElementById('q3Feedback').innerHTML = "Already correct!"; return; }
+        if (!correctFlags.q2) { document.getElementById('q3Feedback').innerHTML = "⚠️ Please finish Question 2 first."; return; }
+        let userChoice = document.getElementById('consistencyUser').value;
+        if (!userChoice) { document.getElementById('q3Feedback').innerHTML = "Please select Consistent or Inconsistent."; return; }
+        if (userChoice.toLowerCase() === consistency.toLowerCase()) {
+            document.getElementById('q3Feedback').innerHTML = "✅ Correct! Consistency matches the theorem.";
+            correctFlags.q3 = true;
+            document.getElementById('q4Area').style.display = 'block';
+        } else {
+            attemptCounter.q3++;
+            let fb = `❌ Incorrect. `;
+            if (attemptCounter.q3 === 1) fb += "💡 Hint: Compare ranks of A and [A|B]. Equal → consistent.";
+            else if (attemptCounter.q3 === 2) fb += "💡 Hint: If ranks are equal → consistent; different → inconsistent.";
+            else {
+                fb += `✅ Correct answer: ${consistency}.`;
+                correctFlags.q3 = true;
+                document.getElementById('q4Area').style.display = 'block';
+            }
+            document.getElementById('q3Feedback').innerHTML = fb;
+        }
+    }
+    
+    // Question 4: solution type
+    function handleQ4() {
+        if (correctFlags.q4) { document.getElementById('q4Feedback').innerHTML = "You already got it!"; return; }
+        if (!correctFlags.q3) { document.getElementById('q4Feedback').innerHTML = "⚠️ Please answer consistency question first."; return; }
+        let userType = document.getElementById('solutionTypeUser').value;
+        if (!userType) { document.getElementById('q4Feedback').innerHTML = "Please select a solution type."; return; }
+        if (userType.toLowerCase() === solutionType.toLowerCase()) {
+            document.getElementById('q4Feedback').innerHTML = "✅ Perfect! You understand the classification.";
+            correctFlags.q4 = true;
+            showFinalAnalysis();
+        } else {
+            attemptCounter.q4++;
+            let fb = `❌ Incorrect. `;
+            if (attemptCounter.q4 === 1) {
+                if (consistency === "Inconsistent") fb += "💡 Hint: Inconsistent ⇒ No solution.";
+                else if (rank_A === n) fb += "💡 Hint: Rank equals number of variables ⇒ Unique solution.";
+                else fb += "💡 Hint: Rank less than variables ⇒ Infinite solutions.";
+            } else if (attemptCounter.q4 === 2) {
+                fb += `💡 The correct answer is: ${solutionType}.`;
+            } else {
+                fb += `✅ Correct answer: ${solutionType}.`;
+                correctFlags.q4 = true;
+                showFinalAnalysis();
+            }
+            document.getElementById('q4Feedback').innerHTML = fb;
+        }
+    }
+    
+    function showFinalAnalysis() {
+        document.getElementById('finalAnalysis').style.display = 'block';
+        let theoremText = "";
+        if (rank_A === rank_AB && rank_A === n) {
+            theoremText = `Since rank(A) = rank([A|B]) = number of variables (${n}), the system is CONSISTENT and has a UNIQUE SOLUTION.`;
+        } else if (rank_A === rank_AB && rank_A < n) {
+            theoremText = `Since rank(A) = rank([A|B]) = ${rank_A} < number of variables (${n}), the system is CONSISTENT and has INFINITE SOLUTIONS.`;
+        } else {
+            theoremText = `Since rank(A) = ${rank_A} ≠ rank([A|B]) = ${rank_AB}, the system is INCONSISTENT and has NO SOLUTION.`;
+        }
+        document.getElementById('finalText').innerHTML = `
+            <strong>Rank of A:</strong> ${rank_A}<br>
+            <strong>Rank of [A|B]:</strong> ${rank_AB}<br>
+            <strong>System Type:</strong> ${consistency}<br>
+            <strong>Solution Type:</strong> ${solutionType}<br><br>
+            📖 <em>${theoremText}</em>
+        `;
+    }
+    
+    // Event listeners
+    document.getElementById('resizeBtn').addEventListener('click', () => {
+        buildMatrixTables();
+        document.getElementById('quizSection').style.display = 'none';
+    });
+    document.getElementById('submitMatricesBtn').addEventListener('click', submitMatrices);
+    document.getElementById('checkRankABtn').addEventListener('click', handleQ1);
+    document.getElementById('checkRankABBtn').addEventListener('click', handleQ2);
+    document.getElementById('checkConsistencyBtn').addEventListener('click', handleQ3);
+    document.getElementById('checkSolutionBtn').addEventListener('click', handleQ4);
+    
+    // initial build
+    buildMatrixTables();
+</script>
+</body>
+</html>

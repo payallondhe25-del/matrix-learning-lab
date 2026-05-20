@@ -1,0 +1,314 @@
+/* -------------------------------------------------------
+   MATRIX CONSISTENCY LEARNING SYSTEM - MAIN STYLES
+   Modern, responsive, interactive design
+-------------------------------------------------------- */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #e9eff7 0%, #d4e0ec 100%);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Courier New', monospace;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(0px);
+    border-radius: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    padding: 1.5rem 2rem 2.5rem;
+    transition: all 0.2s ease;
+}
+
+/* headings */
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(120deg, #1e3c72, #2c7da0);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    border-left: 6px solid #2c7da0;
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+h2, h3 {
+    color: #1e3c72;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid #2c7da0;
+    padding-left: 0.8rem;
+}
+
+/* panels & cards */
+.panel {
+    background: #f9fbfd;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(44, 125, 160, 0.2);
+    transition: transform 0.1s ease;
+}
+
+.panel:hover {
+    border-color: rgba(44, 125, 160, 0.5);
+}
+
+/* matrix tables */
+.matrix-input {
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+table {
+    border-collapse: collapse;
+    background: white;
+    margin: 0.5rem 0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+    overflow: hidden;
+    width: auto;
+    min-width: 200px;
+}
+
+th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+th {
+    background: #eef2ff;
+    font-weight: 600;
+    color: #1e3c72;
+}
+
+input.matrix-cell {
+    width: 85px;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    transition: 0.2s;
+    background: #fff;
+}
+
+input.matrix-cell:focus {
+    outline: none;
+    border-color: #2c7da0;
+    box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+}
+
+/* buttons */
+button {
+    background: #2c7da0;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 6px 8px 6px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+button:hover {
+    background: #1f5e7a;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.secondary {
+    background: #5f7f9e;
+}
+
+button.secondary:hover {
+    background: #446688;
+}
+
+/* quiz areas */
+.quiz-area {
+    background: #eef4ff;
+    border-radius: 1.8rem;
+    padding: 1.2rem 1.8rem;
+    margin: 1.8rem 0;
+    border-left: 8px solid #2c7da0;
+    transition: all 0.2s;
+}
+
+.answer-input {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 1rem 0 0.5rem;
+}
+
+.answer-input input,
+.answer-input select {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 2rem;
+    border: 1px solid #b9d0e0;
+    background: white;
+    font-family: inherit;
+    flex: 1;
+    min-width: 180px;
+    transition: 0.2s;
+}
+
+.answer-input input:focus,
+.answer-input select:focus {
+    outline: none;
+    border-color: #2c7da0;
+    box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+}
+
+.feedback {
+    font-weight: 500;
+    padding: 0.8rem 1rem;
+    border-radius: 1.2rem;
+    background: #fff9e6;
+    margin-top: 1rem;
+    border-left: 5px solid #f5b042;
+    font-size: 0.9rem;
+}
+
+.echelon {
+    background: #eaf7ea;
+    padding: 0.8rem 1rem;
+    border-radius: 1.2rem;
+    font-family: 'Courier New', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre;
+    margin-top: 1rem;
+    border: 1px solid #bddbaf;
+}
+
+.result-box {
+    background: #e1f0fa;
+    border-radius: 1.5rem;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border-left: 6px solid #1e6f5c;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* badges */
+.badge {
+    background: #1e3c72;
+    color: white;
+    border-radius: 40px;
+    padding: 4px 14px;
+    font-size: 0.7rem;
+    display: inline-block;
+}
+
+/* footer */
+footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    color: #4b6a85;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+/* responsive design */
+@media (max-width: 750px) {
+    .container {
+        padding: 1rem;
+    }
+    input.matrix-cell {
+        width: 60px;
+        font-size: 0.75rem;
+        padding: 4px;
+    }
+    th, td {
+        padding: 4px 6px;
+    }
+    button {
+        padding: 8px 18px;
+        font-size: 0.85rem;
+    }
+    .quiz-area {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 1.6rem;
+    }
+}
+
+/* dark mode support (optional, respects system) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a2a32;
+    }
+    .container {
+        background: #1e2b32;
+        color: #eef2ff;
+    }
+    h1, h2, h3 {
+        color: #bfdaf0;
+    }
+    .panel {
+        background: #253c47;
+        border-color: #2c7da0;
+    }
+    table {
+        background: #1f313a;
+    }
+    th {
+        background: #2a4453;
+        color: #eef2ff;
+    }
+    td {
+        border-color: #3a5e6e;
+    }
+    input.matrix-cell {
+        background: #2c3e45;
+        color: #f0f4f8;
+        border-color: #4a7184;
+    }
+    .quiz-area {
+        background: #1f3e4a;
+    }
+    .feedback {
+        background: #2c3e2f;
+        color: #f0f0e0;
+        border-left-color: #ffb347;
+    }
+    .result-box {
+        background: #1b3b44;
+    }
+    button {
+        background: #3d7b9b;
+    }
+    button:hover {
+        background: #2e6480;
+    }
+    footer {
+        color: #99b8cf;
+    }
+}
