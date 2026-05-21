@@ -129,8 +129,8 @@ def main():
     print_matrix("AUGMENTED MATRIX [A|B]", AB)
 
     # Backend calculations
-    rank_A = np.linalg.matrix_rank(A):
-    rank_AB = np.linalg.matrix_rank(AB):
+    #rank_A = np.linalg.matrix_rank(A):
+   # rank_AB = np.linalg.matrix_rank(AB):
 
     # -------------------------------------------------
     # QUESTION 1: Rank of A
